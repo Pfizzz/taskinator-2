@@ -4,6 +4,7 @@ const tasksInProgressEl = document.querySelector("#tasks-in-progress");
 const tasksCompletedEl = document.querySelector("#tasks-completed");
 const pageContentEl = document.querySelector("#page-content");
 let taskIdCounter = 0;
+const tasks = [];
 
 
 
@@ -29,7 +30,8 @@ const taskFormHandler = (event) => {
             // no data attribute, so create objest as normal and pass to createTaskEl function
         const taskDataObj = {
             name: taskNameInput,
-            type: taskTypeInput
+            type: taskTypeInput,
+            status: "to do"
         }
         createTaskEl(taskDataObj);
     };      
@@ -37,20 +39,11 @@ const taskFormHandler = (event) => {
     formEl.reset();
 };
 
-const completeEditTask = (taskName, taskType, taskId) => {
-    // find the matching task list item
-    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
 
-    //set new values
-    taskSelected.querySelector("h3.task-name").textContent = taskName;
-    taskSelected.querySelector("span.task-type").textContent = taskType;
-
-    alert("Task Updated");
-    formEl.removeAttribute("data-task-id");
-    document.querySelector("#save-task").textContent = "Add Task";
-};
 
 const createTaskEl = (taskDataObj) => {
+    console.log(taskDataObj);
+    console.log(taskDataObj.status);
     const listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
     // add task id as a custom attribute
@@ -60,6 +53,10 @@ const createTaskEl = (taskDataObj) => {
     taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
 
     listItemEl.appendChild(taskInfoEl);
+
+    taskDataObj.id = taskIdCounter;
+
+    tasks.push(taskDataObj);
 
     const taskAsctionsEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskAsctionsEl);
@@ -125,6 +122,20 @@ const taskButtonHandler = (event) => {
 const deleteTask = (taskId) => {
     const taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
     taskSelected.remove();
+
+    // create new array to hold updated list of tasks
+    const updatedTaskArr = [];
+
+    // loop through current tasks
+    for (let i = 0; i < tasks.length; i++) {
+        // if tasks[i].id doesnt match the value of taskId, let's keep that task
+        if (tasks[i].id !== parseInt(taskId)) {
+            updatedTaskArr.push(tasks[i]);
+        }
+    }
+
+    // reassign tasks array to be the same as updatedTasksArray
+    tasks = updatedTaskArr;
 };
 
 const editTask = (taskId) => {
@@ -139,6 +150,26 @@ const editTask = (taskId) => {
     document.querySelector("#save-task").textContent = "Save Task";
     formEl.setAttribute("data-task-id", taskId);
 }
+
+const completeEditTask = (taskName, taskType, taskId) => {
+    // find the matching task list item
+    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+
+    //set new values
+    taskSelected.querySelector("h3.task-name").textContent = taskName;
+    taskSelected.querySelector("span.task-type").textContent = taskType;
+
+    // loop through tasks array and task object with new content
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].name = taskName;
+            tasks[i].type = taskType;
+        }
+    }
+    alert("Task Updated");
+    formEl.removeAttribute("data-task-id");
+    document.querySelector("#save-task").textContent = "Add Task";
+};
 
 const taskStatusChangeHandler = (event) => {
     // get the task item's id
@@ -157,6 +188,15 @@ const taskStatusChangeHandler = (event) => {
     else if (statusValue === "completed") {
         tasksCompletedEl.appendChild(taskSelected);
     }
+
+    // update tasks in tasks array
+    for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].status = statusValue;
+        }
+    }
+
+    console.log(tasks);
 }
 
 formEl.addEventListener("submit", taskFormHandler);
