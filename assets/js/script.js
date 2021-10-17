@@ -5,14 +5,25 @@ const tasksToDoEl = document.querySelector("#tasks-to-do");
 
 const taskFormHandler = (event) => {
     event.preventDefault();
-    const taskNameInput = document.querySelector("input[name='task-name']").value;
-    const taskTypeInput = document.querySelector("select[name='task-type']").value;
+    let taskNameInput = document.querySelector("input[name='task-name']").value;
+    let taskTypeInput = document.querySelector("select[name='task-type']").value;
     // package up data as object
-    const taskDataObj = {
-        name: taskNameInput,
-        type: taskTypeInput
-    };
-    createTaskEl(taskDataObj);
+    if (!taskNameInput) {
+        alert("You must enter a task, fool!");
+        return false;
+    }
+    else if (!taskTypeInput) {
+        alert("Whats the task type, hon?");
+        return false;
+    } else {
+        const taskDataObj = {
+            name: taskNameInput,
+            type: taskTypeInput
+        };
+        createTaskEl(taskDataObj);
+        
+    }
+    formEl.reset();
 };
 
 const createTaskEl = (taskDataObj) => {
