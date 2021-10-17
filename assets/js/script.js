@@ -42,8 +42,6 @@ const taskFormHandler = (event) => {
 
 
 const createTaskEl = (taskDataObj) => {
-    console.log(taskDataObj);
-    console.log(taskDataObj.status);
     const listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
     // add task id as a custom attribute
@@ -57,6 +55,7 @@ const createTaskEl = (taskDataObj) => {
     taskDataObj.id = taskIdCounter;
 
     tasks.push(taskDataObj);
+    saveTasks();
 
     const taskAsctionsEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskAsctionsEl);
@@ -136,6 +135,7 @@ const deleteTask = (taskId) => {
 
     // reassign tasks array to be the same as updatedTasksArray
     tasks = updatedTaskArr;
+    saveTasks();
 };
 
 const editTask = (taskId) => {
@@ -167,6 +167,7 @@ const completeEditTask = (taskName, taskType, taskId) => {
         }
     }
     alert("Task Updated");
+    saveTasks();
     formEl.removeAttribute("data-task-id");
     document.querySelector("#save-task").textContent = "Add Task";
 };
@@ -195,9 +196,12 @@ const taskStatusChangeHandler = (event) => {
             tasks[i].status = statusValue;
         }
     }
+    saveTasks();
+};
 
-    console.log(tasks);
-}
+const saveTasks = () => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+};
 
 formEl.addEventListener("submit", taskFormHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
